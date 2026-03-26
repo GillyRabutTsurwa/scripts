@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SITE=$1
-ENVIRONMENT=$2
+SITE="$1";
+ENVIRONMENT="$2";
 
 # helper functions
 function fail {
@@ -28,14 +28,10 @@ function prevent_cloning_to_live() {
 }
 
 function clone() {
-# une solution temporaire, mais pour le moment ca va marcher
-  declare -A url
-  url[su-edu]="www.su.edu";
-  url[su-ssmtva]="www.ssmtva.org";
-
+  read -rp "Enter the official domain of the source site: " domain;
   terminus site:list --field=name --format=list | grep --quiet --line-regexp "$SITE" || fail "$SITE nonexistante. essayez de nouveau" 3;
   terminus backup:create "$SITE.$ENVIRONMENT" --keep-for=90 || fail "could not properly backup site. will not proceed with cloning" 4;
-  terminus env:clone-content "$SITE.live" "$ENVIRONMENT" --from-url="${url["$SITE"]}" --to-url="$ENVIRONMENT-$SITE.pantheonsite.io" || fail "cloning of $SITE.$ENVIRONMENT failed" 5;
+  terminus env:clone-content "$SITE.live" "$ENVIRONMENT" --from-url="$domain" --to-url="$ENVIRONMENT-$SITE.pantheonsite.io" || fail "cloning of $SITE.$ENVIRONMENT failed" 5;
 
   echo "successful cloning of $SITE.$ENVIRONMENT";
 }
